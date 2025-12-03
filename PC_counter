@@ -1,0 +1,18 @@
+module pc_count(clk,rst,pc_nxt,pc);
+input clk,rst;
+input [31:0] pc_nxt;
+output reg [31:0] pc;
+
+always@(posedge clk) begin
+    if(rst)
+        pc<=32'h00000000;
+    else
+        pc<=pc_nxt;
+  
+end
+
+initial begin
+    pc=32'h00000000;
+   // $monitor("PC counter= %h",pc);
+    end
+endmodule
