@@ -1,0 +1,21 @@
+module control_unit_top(op,zero,func3,func7,PCSrc,ResultSrc,MemWrite,ALUSrc,ImmSrc,RegWrite,ALUControl);
+
+input [6:0] op;
+input zero;    
+input func7;
+input [2:0] func3;
+
+output PCSrc,ResultSrc,MemWrite,ALUSrc,RegWrite;
+output [1:0] ImmSrc;
+output [2:0] ALUControl;
+
+wire [1:0] ALUop_wire;
+
+main_decoder main_dec(.op(op),.zero(zero),.PCSrc(PCSrc),.ResultSrc(ResultSrc),.MemWrite(MemWrite),.ALUSrc(ALUSrc),
+                        .ImmSrc(ImmSrc),.RegWrite(RegWrite),.ALUop(ALUop_wire));
+
+alu_decoder alu_dec(.op5(op[5]),.func3(func3),.func7(func7),.ALUop(ALUop_wire),.ALUControl(ALUControl));
+
+
+
+endmodule
