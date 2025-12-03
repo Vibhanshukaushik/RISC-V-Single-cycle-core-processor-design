@@ -1,0 +1,23 @@
+module singletop_tb;
+reg clk,rst;
+
+top dut(clk,rst);
+
+initial begin
+clk=0;
+forever #10 clk=~clk;
+end
+
+task rst_dut();
+begin
+    @(negedge clk)
+        rst=1'b1;
+    @(negedge clk)
+        rst=1'b0;
+end
+endtask
+
+initial begin
+rst_dut;
+end
+endmodule
