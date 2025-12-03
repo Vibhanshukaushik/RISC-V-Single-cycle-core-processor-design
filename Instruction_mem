@@ -1,0 +1,20 @@
+module instruction_mem(A,rst,RD);
+
+input [31:0] A;
+input rst;
+output [31:0] RD;
+
+//////creation of instruction memory
+reg [31:0] mem [1023:0];
+
+assign RD=(rst==1)? 32'h00000000:mem[A];
+
+initial begin
+    mem[0]<=32'h00628233; //add x4,x5,x6
+    mem[4]<=32'h0062E233; //or x4,x5,x6
+    mem[8]<=32'h0004A203; //lw x4, 0(x9)
+    mem[12]<=32'h0044A0A3; //sw x4,1(x9)   rs2=data(x4) rs1=address(x9) imm=1
+    //$monitor("instruction mem RD = %h",RD);
+    end
+
+endmodule
