@@ -1,0 +1,15 @@
+module sign_extend(In,Imm_extend,ImmSrc);
+
+input [31:0] In;
+input ImmSrc;
+output [31:0] Imm_extend;
+
+    assign Imm_extend = (ImmSrc == 1)? ({{20{In[31]}},In[31:25],In[11:7]}) :
+                                        {{20{In[31]}},In[31:20]};
+   /*assign Imm_extend = (ImmSrc == 1)? ({{20{1'b0}},In[31:25],In[11:7]}) :
+                                        {{20{1'b1}},In[31:20]}; (/ previous code*/
+                            // if ImmSrc=1 S tpe iscturction will be followed, ImmSrc==0 I type isctruction will be followed 
+
+
+                        //(In[31]) ? {{20{1'b1}},In[31:20]} : {{20{1'b0}},In[31:20]}; for I type instrction previous code
+endmodule
