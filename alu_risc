@@ -1,0 +1,33 @@
+module alu(a,b,command,y,en,N,Z,C,V);
+input [31:0] a,b;
+input en;
+input [2:0] command;
+output [31:0] y;
+output N,Z,C,V;
+
+reg [31:0] dout;
+reg cout;
+wire ov_add,ov_sub;
+parameter ADD=3'b000,SUB=3'b001,AND=3'b010,OR=3'b011;
+
+always@(*) begin
+    case(command)
+        ADD:{cout,dout}= a + b;
+        SUB:{cout,dout}= a - b;
+        AND:dout= a & b;
+        OR:dout= a | b;
+        default: dout='bx;
+    endcase
+end    
+assign y=en?dout:'bx;
+assign C=cout;
+assign Z=(dout==32'b0);  //&(~dout);
+assign N=dout[31];
+assign ov_add = (~a[31] & ~b[31] & dout[31]) | (a[31] & b[31] & ~dout[31]);
+assign ov_sub = (~a[31] & b[31] & dout[31]) | (a[31] & ~b[31] & ~dout[31]);
+assign V = (command==ADD)?ov_add: (command==SUB)?ov_sub:1'b0;
+
+/*initial begin
+    //$monitor("ALU Output = %h",y);
+    end*/
+endmodule
