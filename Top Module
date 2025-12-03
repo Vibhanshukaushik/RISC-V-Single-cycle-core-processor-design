@@ -1,0 +1,38 @@
+module top(clk,rst);
+input clk,rst;
+//RD1_wire= SrcA
+wire [31:0] pc_wire, RD_insrt_wire,RD1_wire,RD2_wire,Imm_ext_wire,alu_result_wire,Read_data_wire,pc_nxt_wire,SrcB,result; 
+wire [2:0] ALUCtrl_wire;
+wire RegWrite_wire,MemWrite_wire,AluSrc_wire,ResultSrc_wire;
+wire [1:0] ImmSrc_wire;
+
+pc_count pc(.clk(clk),.rst(rst),.pc_nxt(pc_nxt_wire),.pc(pc_wire));
+
+PC_adder adder(.a(pc_wire),.c(pc_nxt_wire));
+
+instruction_mem inst_mem(.A(pc_wire),.rst(rst),.RD(RD_insrt_wire));
+
+register reg_file(.A1(RD_insrt_wire[19:15]),.A2(RD_insrt_wire[24:20]),.A3(RD_insrt_wire[11:7]),.WD3(result),
+                        .WE3(RegWrite_wire),.clk(clk),.rst(rst),.RD1(RD1_wire),.RD2(RD2_wire));
+
+sign_extend sign_ext(.In(RD_insrt_wire),.Imm_extend(Imm_ext_wire),.ImmSrc(ImmSrc_wire[0]));
+
+mux mux_reg_alu(.a(RD2_wire),.b(Imm_ext_wire),.s(AluSrc_wire),.c(SrcB));
+
+alu alu(.a(RD1_wire),.b(SrcB),.command(ALUCtrl_wire),.y(alu_result_wire),.en(1'b1),
+        .N(),.Z(),.C(),.V());
+
+control_unit_top control_unit(.op(RD_insrt_wire[6:0]),.zero(),.func3(RD_insrt_wire[14:12]),
+                              .func7(RD_insrt_wire[29]),.PCSrc(),.ResultSrc(ResultSrc_wire),.MemWrite(MemWrite_wire),
+                              .ALUSrc(AluSrc_wire),.ImmSrc(ImmSrc_wire),.RegWrite(RegWrite_wire),.ALUControl(ALUCtrl_wire));
+                                
+data_mem data_mem(.clk(clk),.rst(rst),.A(alu_result_wire),.WD(RD2_wire),.WE(MemWrite_wire),.RD(Read_data_wire));
+
+mux mux_datamem_reg(.a(alu_result_wire),.b(Read_data_wire),.s(ResultSrc_wire),.c(result));
+
+initial begin
+//$display("time  RST     PC_counter      Instruction_mem     RD1     RD2     ALU_Result      Data_mem        Result_out");
+$monitor("Time= %0t    rst= %b      pc_counter= %h              inst= %h      RD1= %h      RD2= %h      extn=%h      alu= %h      data_mem= %h    result= %h",$time,rst,pc_wire,RD_insrt_wire,RD1_wire,RD2_wire,Imm_ext_wire,alu_result_wire,Read_data_wire,result);
+
+end
+endmodule
